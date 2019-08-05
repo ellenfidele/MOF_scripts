@@ -7,7 +7,13 @@ import scipy.spatial.distance as sp
 
 
 input_pdb = "../structures/mof74_unit_112_final.pdb"
-output_top = "mof74_unit_112_final.itp"
+output_itp = "../scripts/mof74_unit_112_final.ellen.itp"
+output_top = "../scripts/mof74_unit_112_final.ellen.top"
+
+
+# input_pdb = "../UFF/MOF_structure/chimera_224.full.new_resid.pdb"
+# output_itp = "../UFF/chimera_224.full.new_resid.itp"
+# output_top = "../UFF/MOF_TFSI_MG_PC.top"
 
 
 params = '../UFF/UFFparams.newname.txt'
@@ -25,7 +31,9 @@ angle_func = 2
 dihedral_func = 1
 improp_dihedralfunc = 2
 
+
 params_df = pd.read_csv(params, sep='\s+', header = None)
+
 
 atomtypes_params = params_df.loc[params_df[0] == 'atomtypes']
 atomtypes_params.columns = ['atomtypes', 'name', 'bondtype','at.num', 'mass', 'charge', 'ptype', 'sigma', 'epsilon']
@@ -41,7 +49,6 @@ dihedraltypes_params.columns = ['dihedratypes', 'i', 'j', 'k', 'l',  'kd', 'pn']
 
 impropdihedraltypes_params = params_df.loc[params_df[0] == 'improperdihedraltypes'].loc[:,'0':'5']
 impropdihedraltypes_params.columns = ['improperdihedraltypes', 'i', 'j', 'k', 'l',  'kd']
-
 
 
 atom_name_type_dic = {}
@@ -119,7 +126,7 @@ G = nx.Graph()
 
 for i in range(len(d_coords)):
     for j in range(i, len(d_coords)):
-        if 'Mg' in [d_coords.loc[i,'element_symbol'], d_coords.loc[j,'element_symbol']] and dist[i][j]<2.2 and dist[i][j]>0:
+        if ('Mg6' in [d_coords.loc[i,'bondtype'], d_coords.loc[j,'bondtype']] and dist[i][j]<2.2 and dist[i][j]>0):
             G.add_edge(d_coords.loc[i].atom_number, d_coords.loc[j].atom_number)
         elif dist[i][j]<1.8 and dist[i][j]>0:
             G.add_edge(d_coords.loc[i].atom_number, d_coords.loc[j].atom_number)
@@ -133,29 +140,49 @@ bond_df = pd.DataFrame(bond_temp)
 
 angle_temp = []
 for n in G.nodes():
+#     for neigh in  G.neighbors(n):
+#         print(neigh)
     l = list(it.combinations(G.neighbors(n),2))
     if l:
         for item in l:
             angle_temp.append([item[0], n, item[1]])
+#             print(item[0], n, item[1])
+#             G.add_path([l[0], n, l[1]])
 angle_df = pd.DataFrame(angle_temp)
 
 
 dihedral_temp = []
-pairs_temp = []
 for n1 in G.nodes():
-    list_n2 = [x for x in G.neighbors(n1) if d_coords.loc[d_coords['atom_number'].values==x].element_symbol.values!='Mg']
+    list_n2 = [x for x in G.neighbors(n1) if d_coords.loc[d_coords['atom_number'].values==x].bondtype.values!='Mg6']
+#     print(list_1)
     for n2 in list_n2:
-        list_n3 = [x for x in G.neighbors(n2) if d_coords.loc[d_coords['atom_number'].values==x].element_symbol.values!='Mg' and x != n1]
+        list_n3 = [x for x in G.neighbors(n2) if d_coords.loc[d_coords['atom_number'].values==x].bondtype.values!='Mg6' and x != n1]
         for n3 in list_n3:
             list_n4 = [x for x in G.neighbors(n3) if x !=n1 and x!=n2]
             for n4 in list_n4:
                 dih = [n1, n2, n3, n4]
-                if dih.reverse() not in dihedral_temp:
-                    dihedral_temp.append([n1, n2, n3, n4])
-                    pairs_temp.append([n1, n4])
+                if dih[::-1] not in dihedral_temp:
+                    dihedral_temp.append(dih)
+                    
 dihedral_df = pd.DataFrame(dihedral_temp)
+
+
+pairs_temp = []
+for n1 in G.nodes():
+    list_n2 = [x for x in G.neighbors(n1)]
+    for n2 in list_n2:
+        list_n3 = [x for x in G.neighbors(n2) if x != n1]
+        for n3 in list_n3:
+            list_n4 = [x for x in G.neighbors(n3) if x !=n1 and x!=n2]
+            for n4 in list_n4:
+                pr = [n1, n4]
+                if (pr[::-1] not in pairs_temp and pr not in bond_temp and 
+                    pr not in pairs_temp and pr[::-1] not in bond_temp):
+                    pairs_temp.append(pr)
 pairs_df = pd.DataFrame(pairs_temp)
 
+
+len(pairs_temp)
 
 
 def add_improper(n1, n2, n3, n4, temp_list):
@@ -198,17 +225,16 @@ def get_angle(A, B, C):
 
 # Assign parameters for bond/angle/dihedral/improper dihedral
 
-
 def add_bond_params(functype, distance, kb, bond_df, i):
     bond_df.at[i, 'func'] = functype
     bond_df.at[i, 'b0'] = distance
     bond_df.at[i, 'kb'] = kb
 
 
-
 for i in ['func', 'b0', 'kb']:
     bond_df[i] = ''
 for i, n in bond_df.iterrows():
+#     print(i, n[0], n[1])
     atomA = d_coords.iloc[n[0]-1]['atom_name']
     atomB = d_coords.iloc[n[1]-1]['atom_name']
     key_pair = tuple([atom_name_type_dic[atomA], atom_name_type_dic[atomB]])
@@ -272,7 +298,6 @@ def get_dihedral(A, B, C, D):
     return np.degrees(np.arctan2(y, x))
 
 
-
 def get_coords(df, i):
     return np.array([float(df.iloc[i]['x_coord']), float(df.iloc[i]['y_coord']), float(df.iloc[i]['z_coord'])])
 
@@ -282,7 +307,6 @@ def add_dihedral_params(func, phase, kd, pn, df, i):
     df.at[i, 'phase'] = phase
     df.at[i, 'kd'] = kd
     df.at[i, 'pn'] = pn
-
 
 
 for i in ['func', 'phase', 'kd', 'pn']:
@@ -335,43 +359,59 @@ for i, n in improp_dihedral_df.iterrows():
 
 # Assemble top file
 
+with open(output_itp, 'w') as itp:
+    print('[ moleculetype ]\n; Name       nrexcl\nMOF    3\n', file = itp)
 
-with open(output_top, 'w') as top:
-    print('[ moleculetype ]\n; Name       nrexcl\nMOF    3\n', file = top)
 
-#     print('[ atomtypes ]\n; name  bond_type    mass    charge   ptype          sigma      epsilon', file = top)
-#     for i, n in atomtypes_params.iterrows():
-#         print('{:4s} {:9s}{:>3d}{:>13.4f}{:>12.4f}     {:2s}    {:11e}  {:11e}'.format(
-#             n['name'], n['bondtype'],int(n['at.num']),float(n['mass']),float(n['charge']),n['ptype'], float(n['sigma']), float(n['epsilon'])), file=top)
-
-    print('\n[ atoms ]\n; nr type  resnr    residue    atom     cgnr    charge       mass', file = top)
+    print('\n[ atoms ]\n; nr type  resnr    residue    atom     cgnr    charge       mass', file = itp)
     for i, n in d_coords.iterrows():
         print('{:>7d}{:>11s}{:>7d}{:>7s}{:>7s}{:>7d}{:>11.4f}{:>11.4f}'.format(
             int(n['atom_number']), n['bondtype'], int(n['residue_number']), n['residue_name'], n['atom_name'],
-            int(n['atom_number']), float(n['charge']), float(n['mass'])), file = top)
+            int(n['atom_number']), float(n['charge']), float(n['mass'])), file = itp)
 
-    print('\n[ bonds ]\n; i  j  func  b0  kb', file=top)
+    print('\n[ bonds ]\n; i  j  func  b0  kb', file=itp)
     for i, n in bond_df.iterrows():
         print('{:>7d}{:>7d}{:>7d}{:>11.4f}  {:>11.4f}'.format(
-            int(n[0]), int(n[1]), int(n['func']), float(n['b0']*0.1), float(n['kb'])), file=top)
+            int(n[0]), int(n[1]), int(n['func']), float(n['b0']*0.1), float(n['kb'])), file=itp)
 
-    print('\n[ angles ]\n; i  j  k  func  th0  cth', file = top)
+    print('\n[ angles ]\n; i  j  k  func  th0  cth', file = itp)
     for i, n in angle_df.iterrows():
         print('{:>7d}{:>7d}{:>7d}{:>7d}{:>11.1f}  {:>11.4f}'.format(
-            int(n[0]), int(n[1]), int(n[2]), int(n['func']), float(n['th0']), float(n['cth'])), file = top)
+            int(n[0]), int(n[1]), int(n[2]), int(n['func']), float(n['th0']), float(n['cth'])), file = itp)
 
-    print('\n[ dihedrals ]\n; i  j  k  l  func  phase  kd  pn', file = top)
+    print('\n[ dihedrals ]\n; i  j  k  l  func  phase  kd  pn', file = itp)
     for i, n in dihedral_df.iterrows():
         print('{:>7d}{:>7d}{:>7d}{:>7d}{:>7d}{:>11.4f}  {:>11.4f}{:>7d}'.format(
-            int(n[0]), int(n[1]), int(n[2]), int(n[3]), int(n['func']), float(n['phase']), float(n['kd']), int(n['pn'])), file = top)
+            int(n[0]), int(n[1]), int(n[2]), int(n[3]), int(n['func']), float(n['phase']), float(n['kd']), int(n['pn'])), file = itp)
 
-    print('\n[ dihedrals ]\n; improper dihedrals\n; i  j  k  l  func  phase  kd', file = top)
+    print('\n[ dihedrals ]\n; improper dihedrals\n; i  j  k  l  func  phase  kd', file = itp)
     for i, n in improp_dihedral_df.iterrows():
         print('{:>7d}{:>7d}{:>7d}{:>7d}{:>7d}{:>11.4f}  {:>11.4f}'.format(
-            int(n[0]), int(n[1]), int(n[2]), int(n[3]), int(n['func']), float(n['phase']), float(n['kd'])), file = top)
+            int(n[0]), int(n[1]), int(n[2]), int(n[3]), int(n['func']), float(n['phase']), float(n['kd'])), file = itp)
         
-    print('\n[ pairs ]\n', file=top)
+    print('\n[ pairs ]\n', file=itp)
     for i, n in pairs_df.iterrows():
-        print('{:>7d}{:>7d}'.format(int(n[0]), int(n[1])), file = top)
+        print('{:>7d}{:>7d}'.format(int(n[0]), int(n[1])), file = itp)
+
+
+with open(output_top, 'w') as top:
+    print('; Include forcefield parameters\n#include "oplsaa.ff/forcefield.itp" \n', file=top)
+    
+    print('[ atomtypes ]\n; name  bond_type    mass    charge   ptype          sigma      epsilon', file = top)
+    for i, n in atomtypes_params.iterrows():
+        print('{:4s} {:9s}{:>3d}{:>13.4f}{:>12.4f}     {:2s}    {:11e}  {:11e}'.format(
+            n['name'], n['bondtype'],int(n['at.num']),float(n['mass']),float(n['charge']),n['ptype'], float(n['sigma']), float(n['epsilon'])), file=top)
+    
+    print('\n; Include kubisiak forcefield parameters for TFSI\n#include "kubisiak_ffnonbonded.itp"\n#include "kubisiak_ffbond.itp"\n', file=top)
+    
+    print('; Include anion topology\n#include "TFSI_KLU4_from_ATB.itp"\n', file=top)
+    
+    print('; Include parameter for Mg cations\n#include "oplsaa.ff/ions.itp" \n', file=top)
+    
+    print('; Include solvent topology\n#include "PC.itp"\n', file=top)
+    
+    print('; Include MOF topology\n#include "%s"\n' %output_itp, file=top)
+
+
 
 
