@@ -1,0 +1,52 @@
+atomtypes	 H1	 H_	 1	  1.0079	  0.1828	 A	 0.2571	 0.1841	
+atomtypes	 C1	 C_2	 6	 12.0107	  0.7904	 A	 0.3431	 0.4393	
+atomtypes	 C2	 C_R	 6	 12.0107	 -0.2774	 A	 0.3431	 0.4393	
+atomtypes	 C3	 C_R	 6	 12.0107	 -0.2774	 A	 0.3431	 0.4393	
+atomtypes	 C4	 C_R	 6	 12.0107	 -0.2774	 A	 0.3431	 0.4393	
+atomtypes	 O1	 O_2	 8	 15.9994	 -0.8149	 A	 0.3118	 0.2510	
+atomtypes	 O2	 O_2	 8	 15.9994	 -0.8149	 A	 0.3118	 0.2510	
+atomtypes	 O3	 O_3	 8	 15.9994	 -0.8149	 A	 0.3118	 0.2510	
+atomtypes	 Mg1	 Mg6	 12	 24.3050	  1.4902	 A	 0.2691	 0.4644	
+bondtypes	 C_2	 O_2	 1.272 593835.0533
+bondtypes	 C_2	 C_R	 1.540 278229.6455
+bondtypes	 O_2	 Mg6	 2.090 125184.5343
+bondtypes	 C_R	 C_R	 1.418 356410.7638
+bondtypes	 Mg6	 O_3	 2.056 131490.3225
+bondtypes	 O_3	 C_R	 1.393 451713.7269
+bondtypes	 C_R	 H_	 1.089 292531.2321
+angletypes	 O_2	 C_2	 O_2	 125.808	  1758.2497
+angletypes	 O_2	 C_2	 C_R	 117.024	  1281.2544
+angletypes	 C_2	 O_2	 Mg6	 128.100	   445.5519
+angletypes	 Mg6	 O_2	 Mg6	 92.147	   554.6063
+angletypes	 C_2	 C_R	 C_R	 118.829	   889.3484
+angletypes	 C_R	 C_R	 C_R	 119.898	   988.6155
+angletypes	 O_2	 Mg6	 O_3	 88.423	  2119.8829
+angletypes	 O_2	 Mg6	 O_2	 175.385	   232.6690
+angletypes	 O_2	 Mg6	 O_2	 87.801	  2111.8091
+angletypes	 O_3	 Mg6	 O_3	 163.114	   256.9111
+angletypes	 Mg6	 O_3	 C_R	 124.930	   445.4257
+angletypes	 Mg6	 O_3	 Mg6	 96.724	   507.3779
+angletypes	 C_R	 C_R	 O_3	 115.604	  1340.7582
+angletypes	 C_R	 C_R	 H_	 125.229	   469.2236
+dihedraltypes	 C_2	 C_R	 C_R	 C_R	 0.998	    56.3761	 2	
+dihedraltypes	 C_2	 C_R	 C_R	 O_3	 0.986	    56.3761	 2	
+dihedraltypes	 C_2	 C_R	 C_R	 H_	 0.998	    56.3761	 2	
+dihedraltypes	 O_2	 C_2	 O_2	 Mg6	 0.940	    56.3761	 2	
+dihedraltypes	 O_2	 C_2	 C_R	 C_R	 0.995	    20.9200	 3	
+dihedraltypes	 C_R	 C_2	 O_2	 Mg6	 0.948	    56.3761	 2	
+dihedraltypes	 C_R	 C_R	 C_R	 C_R	 0.994	    56.3761	 2	
+dihedraltypes	 C_R	 C_R	 C_R	 H_	 0.995	    56.3761	 2	
+dihedraltypes	 C_R	 C_R	 O_3	 Mg6	 0.500	    20.9200	 3	
+dihedraltypes	 C_R	 C_R	 C_R	 O_3	 1.000	    56.3761	 2	
+dihedraltypes	 O_3	 C_R	 C_R	 H_	 1.000	    56.3761	 2	
+improperdihedraltypes	 C_R	 C_2	 C_R	 C_R	 0.000	     8.3680	 1	
+improperdihedraltypes	 C_R	 C_R	 C_2	 C_R	 0.000	     8.3680	 1	
+improperdihedraltypes	 C_R	 C_R	 C_R	 C_2	 0.000	     8.3680	 1	
+improperdihedraltypes	 C_2	 C_R	 O_2	 O_2	 0.000	    69.7333	 1	
+improperdihedraltypes	 C_2	 O_2	 C_R	 O_2	 0.000	    69.7333	 1	
+improperdihedraltypes	 C_2	 O_2	 O_2	 C_R	 0.000	    69.7333	 1	
+improperdihedraltypes	 C_R	 O_3	 C_R	 C_R	 0.000	     8.3680	 1	
+improperdihedraltypes	 C_R	 C_R	 O_3	 C_R	 0.000	     8.3680	 1	
+improperdihedraltypes	 C_R	 C_R	 C_R	 O_3	 0.000	     8.3680	 1	
+improperdihedraltypes	 C_R	 C_R	 C_R	 H_	 0.000	     8.3680	 1	
+improperdihedraltypes	 C_R	 C_R	 H_	 C_R	 0.000	     8.3680	 1	
