@@ -11,20 +11,21 @@ import argparse as argp
 
 
 parser = argp.ArgumentParser(description='Generate itp and top file from pdb')
-parser.add_argument('--input_pdb', type=str)
-parser.add_argument('--out_path', type=str)
-parser.add_argument('--itp_name', type=str)
-parser.add_argument('--top_name', type=str)
-# args = parser.parse_args(['--input_pdb', "../structures/mof74_unit_112_final.pdb",
-#                          '--out_path', '../scripts',
-#                          '--itp_name', 'mof74_unit_112_final.ellen.itp',
-#                          '--top_name', 'mof74_unit_112_final.ellen.top'])
+parser.add_argument('--pdbin', type=str, help="full path to input pdb file")
+parser.add_argument('--out_path', type=str, help='path to the output itp and top files')
+parser.add_argument('--itp', type=str, help='name of the output itp file')
+parser.add_argument('--top', type=str, help='name of the output top file')
+args = parser.parse_args()
+#args = parser.parse_args(['--pdbin', "../structures/mof74_unit_112_final.pdb",
+#                         '--out_path', '../scripts',
+#                         '--itp', 'mof74_unit_112_final.ellen.itp',
+#                         '--top', 'mof74_unit_112_final.ellen.top'])
 
 
-input_pdb = args.input_pdb
-output_itp_fn = args.itp_name
-output_itp = "%s/%s" %(args.out_path, args.itp_name)
-output_top = "%s/%s" %(args.out_path, args.top_name)
+input_pdb = args.pdbin
+output_itp_fn = args.itp
+output_itp = "%s/%s" %(args.out_path, args.itp)
+output_top = "%s/%s" %(args.out_path, args.top)
 
 
 params = '../UFF/UFF_params.0806.rename.txt'
@@ -36,6 +37,9 @@ special_angle = tuple(['O2m', 'Mg6', 'O2m'])
 
 
 # Read parameter file
+
+print('Reading parameter file...')
+
 
 bond_func = 1
 angle_func = 1
@@ -108,6 +112,9 @@ for i, n in impropdihedraltypes_params.iterrows():
 
 # Read pdb file
 
+print('Reading pdb file...')
+
+
 pdbin = ppdb.PandasPdb()
 pdbin.read_pdb(input_pdb)
 
@@ -131,6 +138,9 @@ dist = np.sqrt(np.sum((coords[:,None,:]-coords[None,:,:])**2, axis=2))
 
 
 # Generate network graphics for the connections in MOF
+
+print('Generating network graphics beased on MOF configureation...')
+
 
 G = nx.Graph()
 
@@ -232,6 +242,9 @@ def get_angle(A, B, C):
 
 
 # Assign parameters for bond/angle/dihedral/improper dihedral
+
+print('Assigning paraters for bond/angle/dihedral/impropers...')
+
 
 def add_bond_params(functype, distance, kb, bond_df, i):
     bond_df.at[i, 'func'] = functype
@@ -387,6 +400,9 @@ for i, n in improp_dihedral_df.iterrows():
 
 # Assemble top file
 
+print('Assembling top/itp files...')
+
+
 with open(output_itp, 'w') as itp:
     print('[ moleculetype ]\n; Name       nrexcl\nMOF    3\n', file = itp)
 
@@ -446,6 +462,9 @@ with open(output_top, 'w') as top:
     print('; Include solvent topology\n#include "PC.itp"\n', file=top)
     
     print('; Include MOF topology\n#include "%s"\n' %output_itp_fn, file=top)
+
+
+print('Done.')
 
 
 
