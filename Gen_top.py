@@ -7,16 +7,24 @@ import pandas as pd
 import biopandas.pdb as ppdb
 import itertools as it
 import scipy.spatial.distance as sp
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-get_ipython().run_line_magic('matplotlib', 'notebook')
-# %config InlineBackend.figure_format='svg'
+import argparse as argp
 
 
-input_pdb = "../structures/mof74_unit_112_final.pdb"
-output_itp_fn = "mof74_unit_112_final.ellen.itp"
-output_itp = "../scripts/%s" %output_itp_fn
-output_top = "../scripts/mof74_unit_112_final.ellen.top"
+parser = argp.ArgumentParser(description='Generate itp and top file from pdb')
+parser.add_argument('--input_pdb', type=str)
+parser.add_argument('--out_path', type=str)
+parser.add_argument('--itp_name', type=str)
+parser.add_argument('--top_name', type=str)
+# args = parser.parse_args(['--input_pdb', "../structures/mof74_unit_112_final.pdb",
+#                          '--out_path', '../scripts',
+#                          '--itp_name', 'mof74_unit_112_final.ellen.itp',
+#                          '--top_name', 'mof74_unit_112_final.ellen.top'])
+
+
+input_pdb = args.input_pdb
+output_itp_fn = args.itp_name
+output_itp = "%s/%s" %(args.out_path, args.itp_name)
+output_top = "%s/%s" %(args.out_path, args.top_name)
 
 
 params = '../UFF/UFF_params.0806.rename.txt'
@@ -77,9 +85,6 @@ for i, n in angletypes_params.iterrows():
         angletype_dic[(n['i'], n['j'], n['k'])] = [angletype_dic[(n['i'], n['j'], n['k'])], single_angletype_dic]
     else:
         angletype_dic[(n['i'], n['j'], n['k'])] = single_angletype_dic
-
-
-dihedraltype_dic
 
 
 dihedraltype_dic = {}
