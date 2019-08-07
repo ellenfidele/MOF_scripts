@@ -10,18 +10,18 @@ import scipy.spatial.distance as sp
 import argparse as argp
 
 
-parser = argp.ArgumentParser(description='Generate itp and top file from pdb')
+parser = argp.ArgumentParser(description='Generate itp and top file from pdb. Please make sure the atom_number in pdb are in acsending order')
 parser.add_argument('--pdbin', type=str, help="full path to input pdb file")
 parser.add_argument('--out_path', type=str, help='path to the output itp and top files')
 parser.add_argument('--itp', type=str, help='name of the output itp file')
 parser.add_argument('--top', type=str, help='name of the output top file')
 parser.add_argument('--params', type=str, help="full path to the parameter file")
-args = parser.parse_args()
-#args = parser.parse_args(['--pdbin', "../structures/mof74_unit_112_final.pdb",
-#                         '--out_path', '../scripts',
-#                         '--itp', 'mof74_unit_112_final.ellen.itp',
-#                         '--top', 'mof74_unit_112_final.ellen.top', 
-#                         '--params', '../UFF/UFF_params.0806.rename.txt'])
+# args = parser.parse_args()
+args = parser.parse_args(['--pdbin', "../UFF/MOF_structure/chimera_224.full.new_resid.pdb",
+                         '--out_path', '../UFF/test_th/',
+                         '--itp', 'chimera_224.full.new_resid.itp',
+                         '--top', 'chimera_224.full.new_resid.top', 
+                         '--params', '../UFF/UFF_params.0806.rename.txt'])
 
 
 input_pdb = args.pdbin
@@ -149,7 +149,7 @@ for i in range(len(d_coords)):
     for j in range(i, len(d_coords)):
         if ('Mg6' in [d_coords.loc[i,'bondtype'], d_coords.loc[j,'bondtype']] and dist[i][j]<2.2 and dist[i][j]>0):
             G.add_edge(d_coords.loc[i].atom_number, d_coords.loc[j].atom_number)
-        elif dist[i][j]<1.8 and dist[i][j]>0:
+        elif dist[i][j]<1.7 and dist[i][j]>0:
             G.add_edge(d_coords.loc[i].atom_number, d_coords.loc[j].atom_number)
 
 
@@ -203,10 +203,10 @@ for n1 in G.nodes():
 pairs_df = pd.DataFrame(pairs_temp)
 
 
-def add_improper(n1, n2, n3, n4, temp_list):
-    temp_list.append([n1, n2, n3, n4])
-    temp_list.append([n1, n3, n2, n4])
-    temp_list.append([n1, n3, n4, n2])
+def add_improper(a1, a2, a3, a4, temp_list):
+    temp_list.append([a1, a2, a3, a4])
+    temp_list.append([a1, a3, a2, a4])
+    temp_list.append([a1, a3, a4, a2])
 
 
 def find_improper(at1, at2, at3, at4, G, coords_df, out_list):
@@ -214,11 +214,11 @@ def find_improper(at1, at2, at3, at4, G, coords_df, out_list):
         list_n = [x for x in G.neighbors(n1['atom_number'])]
         for i in list_n:
             if coords_df.iloc[i-1]['atom_name'] == at2:
-                n2 = i
+                n2 = coords_df.iloc[i-1]['atom_number']
             elif coords_df.iloc[i-1]['atom_name'] == at3:
-                n3 = i
+                n3 = coords_df.iloc[i-1]['atom_number']
             elif coords_df.iloc[i-1]['atom_name'] == at4:
-                n4 = i
+                n4 = coords_df.iloc[i-1]['atom_number']
         add_improper(n1['atom_number'], n2, n3, n4, out_list)
 
 
