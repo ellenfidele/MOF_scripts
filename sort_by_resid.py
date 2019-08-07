@@ -5,11 +5,22 @@ import numpy as np
 import networkx as nx
 import pandas as pd
 import biopandas.pdb as ppdb
+import argparse as argp
 
 
-input_pdb = "../UFF/MOF_structure/chimera_224.full.pdb"
-output_pdb = "../UFF/MOF_structure/chimera_224.full.new_resid.pdb"
-id_map = '../UFF/MOF_structure/chimera_224.full.old_to_new.txt'
+parser = argp.ArgumentParser(description='Define whole ligand molecule as a residue. Sort input pdb by residue number')
+parser.add_argument('--pdbin', help='Full path to input pdb', type=str)
+parser.add_argument('--pdbout', help='Full path to output pdb', type=str)
+parser.add_argument('--idmap', help='Full path to the map file. Old atom number vs. new atom number.', type=str)
+args = parser.parse_args()
+#args = parser.parse_args(['--pdbin', "../UFF/MOF_structure/chimera_224.full.pdb",
+#                         '--pdbout', "../UFF/MOF_structure/chimera_224.full.new_resid.pdb",
+#                         '--idmap', '../UFF/MOF_structure/chimera_224.full.old_to_new.txt'])
+
+
+input_pdb = args.pdbin
+output_pdb = args.pdbout
+id_map = args.idmap
 
 
 pdb = ppdb.PandasPdb()
@@ -26,7 +37,6 @@ coords = d_coords[['x_coord','y_coord', 'z_coord']].values
 dist = np.sqrt(np.sum((coords[:,None,:]-coords[None,:,:])**2,axis=2))
 
 
-# d_coords['atom_number_temp'] = d_coords.index +1
 d_coords['residue_name'] = 'MOF'
 
 
@@ -37,8 +47,6 @@ for i in range(len(d_coords)):
     for j in range(i, len(d_coords)):
         if dist[i][j]<1.8 and dist[i][j]>0:
             G.add_edge(d_coords.iloc[i].atom_number, d_coords.iloc[j].atom_number)
-#     if i%10 == 0:
-#         print(i)
 
 
 d_coords.insert(loc=1,column='new_atom_number',value=0)
@@ -49,9 +57,6 @@ for group in nx.connected_components(G):
     for item in group:
         d_coords.loc[d_coords.atom_number==item, 'residue_number'] = int(resid)
     resid += 1
-# for i in nx.isolates(G):
-#     d_coords.loc[d_coords.atom_number==i, 'residue_number'] = int(resid)
-#     resid += 1
 
 
 d_coords = d_coords.astype({'residue_number': 'int'})

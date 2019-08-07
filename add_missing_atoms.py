@@ -1,12 +1,24 @@
+#!/usr/bin/env python
+# coding: utf-8
+
 import numpy as np
 import pandas as pd
 import networkx as nx
 import biopandas.pdb as ppdb
 import scipy.spatial.distance as sp
+import argparse as argp
 
 
-file_in = '../UFF/MOF_structure/chimera_224.merge.pdb'
-file_out = '../UFF/MOF_structure/chimera_224.full.pdb'
+parser = argp.ArgumentParser(description='Add missing atoms in the MOF ligand molecules. (for MOF74-Mg only)')
+parser.add_argument('--pdbin', help='Full path to input pdb', type=str)
+parser.add_argument('--pdbout', help='Full path to output pdb', type=str)
+args = parser.parse_args()
+#args = parser.parse_args(['--pdbin', '../UFF/MOF_structure/chimera_224.merge.pdb',
+#                         '--pdbout', '../UFF/MOF_structure/chimera_224.full.pdb'])
+
+
+file_in = args.pdbin
+file_out = args.pdbout
 
 
 pdb = ppdb.PandasPdb()
