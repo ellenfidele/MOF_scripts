@@ -8,7 +8,7 @@ import biopandas.pdb as ppdb
 import argparse as argp
 
 
-parser = argp.ArgumentParser(description='Define whole ligand molecule as a residue. Sort input pdb by residue number')
+parser = argp.ArgumentParser(description='Define whole ligand molecule as a residue(for MOF74-Mg only).\n Sort input pdb by residue number')
 parser.add_argument('--pdbin', help='Full path to input pdb', type=str)
 parser.add_argument('--pdbout', help='Full path to output pdb', type=str)
 parser.add_argument('--idmap', help='Full path to the map file. Old atom number vs. new atom number.', type=str)

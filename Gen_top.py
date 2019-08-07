@@ -10,7 +10,7 @@ import scipy.spatial.distance as sp
 import argparse as argp
 
 
-parser = argp.ArgumentParser(description='Generate itp and top file from pdb. Please make sure the atom_number in pdb are in acsending order')
+parser = argp.ArgumentParser(description='Generate itp and top file from pdb(for MOF74-Mg only).\n Please make sure the atom_number in pdb are in acsending order!')
 parser.add_argument('--pdbin', type=str, help="full path to input pdb file")
 parser.add_argument('--out_path', type=str, help='path to the output itp and top files')
 parser.add_argument('--itp', type=str, help='name of the output itp file')
