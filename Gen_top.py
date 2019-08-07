@@ -15,20 +15,20 @@ parser.add_argument('--pdbin', type=str, help="full path to input pdb file")
 parser.add_argument('--out_path', type=str, help='path to the output itp and top files')
 parser.add_argument('--itp', type=str, help='name of the output itp file')
 parser.add_argument('--top', type=str, help='name of the output top file')
+parser.add_argument('--params', type=str, help="full path to the parameter file")
 args = parser.parse_args()
 #args = parser.parse_args(['--pdbin', "../structures/mof74_unit_112_final.pdb",
 #                         '--out_path', '../scripts',
 #                         '--itp', 'mof74_unit_112_final.ellen.itp',
-#                         '--top', 'mof74_unit_112_final.ellen.top'])
+#                         '--top', 'mof74_unit_112_final.ellen.top', 
+#                         '--params', '../UFF/UFF_params.0806.rename.txt'])
 
 
 input_pdb = args.pdbin
 output_itp_fn = args.itp
 output_itp = "%s/%s" %(args.out_path, args.itp)
 output_top = "%s/%s" %(args.out_path, args.top)
-
-
-params = '../UFF/UFF_params.0806.rename.txt'
+params = args.params
 
 
 # special_bond = tuple(['UC2', 'UO2'])
