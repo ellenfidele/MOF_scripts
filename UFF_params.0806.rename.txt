@@ -1,11 +1,11 @@
 atomtypes	 H1	 Hm	 1	  1.0079	  0.1828	 A	 0.2571	 0.1841	
 atomtypes	 C1	 C2m	 6	 12.0107	  0.7904	 A	 0.3431	 0.4393	
 atomtypes	 C2	 CRm	 6	 12.0107	 -0.2774	 A	 0.3431	 0.4393	
-atomtypes	 C3	 CRm	 6	 12.0107	 -0.2774	 A	 0.3431	 0.4393	
-atomtypes	 C4	 CRm	 6	 12.0107	 -0.2774	 A	 0.3431	 0.4393	
-atomtypes	 O1	 O2m	 8	 15.9994	 -0.8149	 A	 0.3118	 0.2510	
+atomtypes	 C3	 CRm	 6	 12.0107	 -0.2284	 A	 0.3431	 0.4393	
+atomtypes	 C4	 CRm	 6	 12.0107	  0.4362	 A	 0.3431	 0.4393	
+atomtypes	 O1	 O2m	 8	 15.9994	 -0.6949	 A	 0.3118	 0.2510	
 atomtypes	 O2	 O2m	 8	 15.9994	 -0.8149	 A	 0.3118	 0.2510	
-atomtypes	 O3	 O3m	 8	 15.9994	 -0.8149	 A	 0.3118	 0.2510	
+atomtypes	 O3	 O3m	 8	 15.9994	 -0.8804	 A	 0.3118	 0.2510	
 atomtypes	 Mg1	 Mg6	 12	 24.3050	  1.4902	 A	 0.2691	 0.4644	
 bondtypes	 C2m	 O2m	 1.272 593835.0533
 bondtypes	 C2m	 CRm	 1.540 278229.6455
