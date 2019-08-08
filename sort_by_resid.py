@@ -8,7 +8,7 @@ import biopandas.pdb as ppdb
 import argparse as argp
 
 
-parser = argp.ArgumentParser(description='Define whole ligand molecule as a residue. Sort input pdb by residue number')
+parser = argp.ArgumentParser(description='Define whole ligand molecule as a residue(for Mg-MOF74 only). Sort input pdb by residue number')
 parser.add_argument('--pdbin', help='Full path to input pdb', type=str)
 parser.add_argument('--pdbout', help='Full path to output pdb', type=str)
 parser.add_argument('--idmap', help='Full path to the map file. Old atom number vs. new atom number.', type=str)
@@ -66,9 +66,6 @@ d_coords_sorted = d_coords.sort_values(by=['residue_number', 'atom_name'])
 d_coords_sorted.new_atom_number = d_coords_sorted.reset_index(drop=True).index + 1
 
 
-d_coords_sorted
-
-
 with open(id_map,'w') as mapfile:
 #     mapfile.write('old_atom_number\tnew_atom_number\n')
     idmap =  d_coords_sorted[['atom_number', 'new_atom_number']].values
@@ -77,9 +74,6 @@ with open(id_map,'w') as mapfile:
 
 d_coords_sorted_cleaned = d_coords_sorted.drop(columns=['atom_number','blank_1', 'blank_2',
                                                'blank_3', 'blank_4', 'segment_id', 'line_idx']).reset_index(drop=True).fillna('')
-
-
-d_coords_sorted_cleaned
 
 
 # get the max len of CONECT section
