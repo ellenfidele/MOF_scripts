@@ -10,7 +10,7 @@ import scipy.spatial.distance as sp
 import argparse as argp
 
 
-parser = argp.ArgumentParser(description='Generate itp and top file from pdb(for MOF74-Mg only).\n Please make sure the atom_number in pdb are in acsending order!')
+parser = argp.ArgumentParser(description='Generate itp and top file from pdb(for Mg-MOF74 only).\n Please make sure the atom_number in pdb are in acsending order')
 parser.add_argument('--pdbin', type=str, help="full path to input pdb file")
 parser.add_argument('--out_path', type=str, help='path to the output itp and top files')
 parser.add_argument('--itp', type=str, help='name of the output itp file')
@@ -330,15 +330,15 @@ def add_dihedral_params(func, C,  df, i):
 
 def calc_RB_params(kd, th0, pn):
     if pn == 2:
-        C0 = 0.5*kd*(1+np.cos(np.deg2rad(2*th0)))
-        C2 = -kd*np.cos(np.deg2rad(2*th0))
+        C0 = 0.5*kd*(1+np.cos(np.deg2rad(2.0*th0)))
+        C2 = -kd*np.cos(np.deg2rad(2.0*th0))
         C1 = C3 = C4 = C5 = 0 
     elif pn == 3:
         C0 = 0.5*kd
-        C3 = -0.125*kd*np.cos(np.deg2rad(3*th0))
-        C1 = 3 * C3
+        C3 = -2.0*kd*np.cos(np.deg2rad(3.0*th0))
+        C1 = -0.75 * C3
         C2 = C4 = C5 = 0
-    return [C0, C1, C2, C3, C4, C5]
+    return [C0, -1.0*C1, C2, -1.0*C3, C4, C5]
 
 
 for i in ['func', 'C0', 'C1', 'C2', 'C3', 'C4', 'C5']:
