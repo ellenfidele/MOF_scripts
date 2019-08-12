@@ -32,6 +32,17 @@ atom_name_type_dic = {'H1': 'H_',
  'Mg1': 'Mg6'}
 
 
+atom_charge_dic = {'H1': 0.1828,
+ 'C1': 0.7904,
+ 'C2': -0.2774,
+ 'C3': -0.2284,
+ 'C4': 0.4362,
+ 'O1': -0.6949,
+ 'O2': -0.8149,
+ 'O3': -0.8804,
+ 'Mg1': 1.4902}
+
+
 replace_map = {
     'H_': 'Hm',
     'C_2': 'C2m',
@@ -344,8 +355,9 @@ dihedraltypes.keys()
 avg_dihedraltypes = {}
 for key in dihedraltypes:
 #     fig = plt.figure()
-#     plt.hist(dihedraltypes[key], 180)
+#     plt.hist(dihedraltypes[key], 45)
 #     plt.title(key)
+#     plt.xlim([-180, 180])
 #     if key == ('C_R', 'C_R', 'O_3', 'Mg6'):
 #         temp_dih_large = [i for i in dihedraltypes[key] if abs(np.cos(np.deg2rad(i))) > 0.5]
 #         temp_dih_small = [i for i in dihedraltypes[key] if abs(np.cos(np.deg2rad(i))) < 0.5]
@@ -359,8 +371,9 @@ for key in dihedraltypes:
     if ((key[1], key[2])== ('C_R', 'O_3') or (key[2], key[1]) == ('C_R', 'O_3')
           or (key[1], key[2])== ('C_R', 'C_2') or (key[2], key[1]) == ('C_R', 'C_2')):
         avg = np.average(np.absolute(np.cos(np.deg2rad(dihedraltypes[key]))))
-        k = calc_dihedral_params(key[1], key[2], 1, uff_params_df)
-        avg_dihedraltypes[key] = [avg, k, 3]
+#         k = calc_dihedral_params(key[1], key[2], 1, uff_params_df)
+        k = 1*4.184*2
+        avg_dihedraltypes[key] = [avg, k, 6]
     else:
         avg = np.average(np.absolute(np.cos(np.deg2rad(dihedraltypes[key]))))
         k = calc_dihedral_params(key[1], key[2], 1.5, uff_params_df)
@@ -416,7 +429,7 @@ with open(output_params, 'w') as params:
     for k in atom_name_type_dic:
         at = atom_name_type_dic[k]
         print('atomtypes\t %s\t %s\t %d\t %7.4f\t %7.4f\t %c\t %6.4f\t %6.4f\t'
-             %(k, at, atomtypes[at][0],atomtypes[at][1], atomtypes[at][2], atomtypes[at][3], atomtypes[at][4],
+             %(k, at, atomtypes[at][0],atomtypes[at][1], atom_charge_dic[k], atomtypes[at][3], atomtypes[at][4],
               atomtypes[at][5]), file=params)
         
     for k in avg_bondtypes:
@@ -439,4 +452,10 @@ with open(output_params, 'w') as params:
     for k in avg_impropertypes:
         print('improperdihedraltypes\t %s\t %s\t %s\t %s\t %5.3f\t %10.4f\t %d\t' 
               %(k[0], k[1], k[2], k[3], avg_impropertypes[k][0], avg_impropertypes[k][1], avg_impropertypes[k][2]), file=params)
+
+
+
+
+
+
 

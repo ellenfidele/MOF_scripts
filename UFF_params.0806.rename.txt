@@ -32,11 +32,11 @@ dihedraltypes	 C2m	 CRm	 CRm	 CRm	 0.998	    56.3761	 2
 dihedraltypes	 C2m	 CRm	 CRm	 O3m	 0.986	    56.3761	 2	
 dihedraltypes	 C2m	 CRm	 CRm	 Hm	 0.998	    56.3761	 2	
 dihedraltypes	 O2m	 C2m	 O2m	 Mg6	 0.940	    56.3761	 2	
-dihedraltypes	 O2m	 C2m	 CRm	 CRm	 0.995	    20.9200	 3	
+dihedraltypes	 O2m	 C2m	 CRm	 CRm	 0.995	     8.3680	 6	
 dihedraltypes	 CRm	 C2m	 O2m	 Mg6	 0.948	    56.3761	 2	
 dihedraltypes	 CRm	 CRm	 CRm	 CRm	 0.994	    56.3761	 2	
 dihedraltypes	 CRm	 CRm	 CRm	 Hm	 0.995	    56.3761	 2	
-dihedraltypes	 CRm	 CRm	 O3m	 Mg6	 0.500	    20.9200	 3	
+dihedraltypes	 CRm	 CRm	 O3m	 Mg6	 0.500	     8.3680	 6	
 dihedraltypes	 CRm	 CRm	 CRm	 O3m	 1.000	    56.3761	 2	
 dihedraltypes	 O3m	 CRm	 CRm	 Hm	 1.000	    56.3761	 2	
 improperdihedraltypes	 CRm	 C2m	 CRm	 CRm	 0.000	     8.3680	 1	

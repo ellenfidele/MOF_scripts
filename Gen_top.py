@@ -18,7 +18,7 @@ parser.add_argument('--top', type=str, help='name of the output top file')
 parser.add_argument('--params', type=str, help="full path to the parameter file")
 args = parser.parse_args()
 #args = parser.parse_args(['--pdbin', "../UFF/MOF_structure/chimera_224.full.new_resid.pdb",
-#                         '--out_path', '../UFF/test_th/',
+#                         '--out_path', '../UFF/MOF_structure/',
 #                         '--itp', 'chimera_224.full.new_resid.itp',
 #                         '--top', 'chimera_224.full.new_resid.top', 
 #                         '--params', '../UFF/UFF_params.0806.rename.txt'])
@@ -43,7 +43,9 @@ print('Reading parameter file...')
 
 bond_func = 1
 angle_func = 1
-dihedral_func = 3 # Ryckaert- Bellemans dihedral
+dihedral_func_RB = 3 # Ryckaert- Bellemans dihedral
+dihedral_func_p = 1 # periodic dihedral
+dihedral_func = {6.0: dihedral_func_p, 2.0: dihedral_func_RB}
 improp_dihedralfunc = 4 # periodic im- proper dihedral
 
 
@@ -94,7 +96,7 @@ for i, n in angletypes_params.iterrows():
 dihedraltype_dic = {}
 single_dihedraltype_dic = {'func':'', 'kd':'', 'pn':''}
 for i, n in dihedraltypes_params.iterrows():
-    single_dihedraltype_dic = {'func':dihedral_func, 'kd':n['kd'], 'pn':n['pn']}
+    single_dihedraltype_dic = {'func':dihedral_func[n['pn']], 'kd':n['kd'], 'pn':n['pn']}
     if (n['i'], n['j'], n['k'], n['l']) in dihedraltype_dic.keys():
         dihedraltype_dic[(n['i'], n['j'], n['k'], n['l'])] = [dihedraltype_dic[(n['i'], n['j'], n['k'], n['l'])], single_dihedraltype_dic]
     else:
@@ -318,13 +320,23 @@ def get_coords(df, i):
     return np.array([float(df.iloc[i]['x_coord']), float(df.iloc[i]['y_coord']), float(df.iloc[i]['z_coord'])])
 
 
-def add_dihedral_params(func, C,  df, i):
+def add_dihedral_params_RB(func, C,  df, i):
     df.at[i, 'C0'] = C[0]
     df.at[i, 'C1'] = C[1]
     df.at[i, 'C2'] = C[2]
     df.at[i, 'C3'] = C[3]
     df.at[i, 'C4'] = C[4]
     df.at[i, 'C5'] = C[5]
+    df.at[i, 'func'] = func
+
+
+def add_dihedral_params_p(func, kd, dih, pn,  df, i):
+    df.at[i, 'C0'] = dih
+    df.at[i, 'C1'] = kd
+    df.at[i, 'C2'] = pn
+    df.at[i, 'C3'] = ''
+    df.at[i, 'C4'] = ''
+    df.at[i, 'C5'] = ''
     df.at[i, 'func'] = func
 
 
@@ -358,11 +370,23 @@ for i, n in dihedral_df.iterrows():
 #         add_dihedral_params(dihedral_func, dih, kd, dihedraltype_dic[special_dihedral][0]['pn'], dihedral_df, i)
 #     el
     if key in dihedraltype_dic.keys():
-        C = calc_RB_params(float(dihedraltype_dic[key]['kd']), dih, dihedraltype_dic[key]['pn'])
-        add_dihedral_params(dihedral_func,C, dihedral_df, i)
+        if dihedraltype_dic[key]['func'] == 1:
+            add_dihedral_params_p(func=dihedraltype_dic[key]['func'], kd= dihedraltype_dic[key]['kd'], pn=dihedraltype_dic[key]['pn'],
+                                 dih=dih, df=dihedral_df, i=i)
+        elif dihedraltype_dic[key]['func'] == 3:
+            C = calc_RB_params(float(dihedraltype_dic[key]['kd']), dih, dihedraltype_dic[key]['pn'])
+            add_dihedral_params_RB(dihedraltype_dic[key]['func'],C, dihedral_df, i)
+        else:
+            raise Exception('dihedral func type %d not found' %dihedraltype_dic[key]['func'])
     elif key[::-1] in dihedraltype_dic.keys():
-        C = calc_RB_params(float(dihedraltype_dic[key[::-1]]['kd']), dih, dihedraltype_dic[key[::-1]]['pn'])
-        add_dihedral_params(dihedral_func, C, dihedral_df, i)
+        if dihedraltype_dic[key[::-1]]['func'] == 1:
+            add_dihedral_params_p(func=dihedraltype_dic[key[::-1]]['func'], kd= dihedraltype_dic[key[::-1]]['kd'], pn=dihedraltype_dic[key[::-1]]['pn'],
+                                 dih=dih, df=dihedral_df, i=i)
+        elif dihedraltype_dic[key[::-1]]['func'] == 3:
+            C = calc_RB_params(float(dihedraltype_dic[key[::-1]]['kd']), dih, dihedraltype_dic[key[::-1]]['pn'])
+            add_dihedral_params_RB(dihedraltype_dic[key[::-1]]['func'],C, dihedral_df, i)
+        else:
+            raise Exception('dihedral func type %d not found' %dihedraltype_dic[key[::-1]]['func'])
     else:
         raise Exception('dihedraltype %s-%s-%s-%s not fond in parameter file' 
                         %(d_coords.iloc[n[0]-1]['bondtype'], d_coords.iloc[n[1]-1]['bondtype'], d_coords.iloc[n[2]-1]['bondtype'], d_coords.iloc[n[3]-1]['bondtype']))       
@@ -423,11 +447,15 @@ with open(output_itp, 'w') as itp:
         print('{:>7d}{:>7d}{:>7d}{:>7d}{:>11.1f}  {:>11.4f}'.format(
             int(n[0]), int(n[1]), int(n[2]), int(n['func']), float(n['th0']), float(n['cth'])), file = itp)
 
-    print('\n[ dihedrals ]\n; i  j  k  l  C0  C1  C2  C3  C4  C5', file = itp)
+    print('\n[ dihedrals ]\n; i  j  k  l  func coeff.', file = itp)
     for i, n in dihedral_df.iterrows():
-        print('{:>7d}{:>7d}{:>7d}{:>7d}{:>7d}{:>11.4f}  {:>11.4f} {:>11.4f}  {:>11.4f} {:>11.4f}  {:>11.4f}'.format(
-            int(n[0]), int(n[1]), int(n[2]), int(n[3]), int(n['func']), float(n['C0']), float(n['C1']), float(n['C2']), 
-        float(n['C3']), float(n['C4']), float(n['C5'])), file = itp)
+        if n['func'] == 3:
+            print('{:>7d}{:>7d}{:>7d}{:>7d}{:>7d}{:>11.4f}  {:>11.4f} {:>11.4f}  {:>11.4f} {:>11.4f}  {:>11.4f}'.format(
+                int(n[0]), int(n[1]), int(n[2]), int(n[3]), int(n['func']), float(n['C0']), float(n['C1']), float(n['C2']), 
+            float(n['C3']), float(n['C4']), float(n['C5'])), file = itp)
+        elif n['func'] == 1:
+            print('{:>7d}{:>7d}{:>7d}{:>7d}{:>7d}{:>11.4f}  {:>11.4f} {:>7.1f}'.format(
+                int(n[0]), int(n[1]), int(n[2]), int(n[3]), int(n['func']), float(n['C0']), float(n['C1']), float(n['C2'])), file = itp)
 
     print('\n[ dihedrals ]\n; improper dihedrals\n; i  j  k  l  func  phase  kd', file = itp)
     for i, n in improp_dihedral_df.iterrows():
