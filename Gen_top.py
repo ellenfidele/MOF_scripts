@@ -17,7 +17,7 @@ parser.add_argument('--itp', type=str, help='name of the output itp file')
 parser.add_argument('--top', type=str, help='name of the output top file')
 parser.add_argument('--params', type=str, help="full path to the parameter file")
 args = parser.parse_args()
-#args = parser.parse_args(['--pdbin', "../UFF/MOF_structure/chimera_224.full.new_resid.pdb",
+#args = parser.parse_args(['--pdbin', "../UFF/MOF_structure/chimera_224.full.new_resid.box.pdb",
 #                         '--out_path', '../UFF/MOF_structure/',
 #                         '--itp', 'chimera_224.full.new_resid.itp',
 #                         '--top', 'chimera_224.full.new_resid.top', 
@@ -130,7 +130,13 @@ d_coords['charge'] = ""
 for i, n in d_coords.iterrows():
     d_coords.at[i,'bondtype'] = atom_name_type_dic[d_coords.iloc[i]['atom_name']]
     d_coords.at[i,'mass'] = atomtypes_params.loc[atomtypes_params['bondtype'] == d_coords.iloc[i]['bondtype']]['mass'].values[0]
-    d_coords.at[i,'charge'] = atomtypes_params.loc[atomtypes_params['bondtype'] == d_coords.iloc[i]['bondtype']]['charge'].values[0]
+    d_coords.at[i,'charge'] = atomtypes_params.loc[atomtypes_params['name'] == d_coords.iloc[i]['atom_name']]['charge'].values[0]
+
+
+total_charge = np.sum(d_coords['charge'])
+
+
+total_charge
 
 
 coords = d_coords[['x_coord', 'y_coord', 'z_coord']].values
